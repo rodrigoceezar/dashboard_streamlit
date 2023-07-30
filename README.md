@@ -1,4 +1,4 @@
-# Dashboard com Streamlit, Pandas e Plotly
+# Dashboard com Streamlit
 
 ![Logo_Streamlit](img/streamlit_hero.jpg)
 
