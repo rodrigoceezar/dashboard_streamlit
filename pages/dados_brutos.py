@@ -3,6 +3,17 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.express as px
+import time
+
+@st.cache_data
+def converte_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
+
+def mensagem_sucesso():
+    sucesso = st.sucess('Arquivo baixado com sucesso!', icon='✅')
+    time.sleep(5)
+    sucesso.empty()
+
 
 st.title('DADOS BRUTOS')
 
@@ -41,13 +52,25 @@ with st.sidebar.expander('Quantidade de parcelas'):
 
 query = '''
 Produto in @produtos and \
-@preco[0] <= Preço <= @preco and \
-@data_compra[0] <= `Data da Compra` <=@data_compra[1]
+@preco[0] <= Preço <= @preco[1] and \
+@data_compra[0] <= `Data da Compra` <= @data_compra[1]
 '''
+
 
 dados_filtrados = dados.query(query)
 dados_filtrados = dados_filtrados[colunas]
 
 st.dataframe(dados_filtrados)
 
-st.markdown(f'A tabela possui :blue[{dados_filtrados.shape[0]}] linhas e :blue [{dados.filtrados.shape[1]}]')
+st.markdown(f'A tabela possui :blue[{dados_filtrados.shape[0]}] linhas e :blue[{dados_filtrados.shape[1]}] colunas.')
+
+
+st.markdown('Escreve um nome para o arquivo')
+coluna1,coluna2 = st.columns(2)
+
+with coluna1:
+    nome_arquivo = st.text_input('', label_visibility='collapsed', value='Dados')
+    nome_arquivo += '.csv'
+
+with coluna2:
+    st.download_button('Fazer o download da tabela em csv', data=converte_csv(dados_filtrados), file_name=nome_arquivo, mime='text/csv', on_click=mensagem_sucesso)
